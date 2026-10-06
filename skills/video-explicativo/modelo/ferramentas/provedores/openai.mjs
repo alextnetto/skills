@@ -36,9 +36,9 @@ export default {
     if (!/^tts-1/.test(modelo)) body.instructions = voz.instrucoes || INSTRUCOES;
     if (voz.velocidade && voz.velocidade !== 1) body.speed = voz.velocidade;
     const res = await call(key, '/audio/speech', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    fs.writeFileSync(`${tmp}.wav`, Buffer.from(await res.arrayBuffer()));
-    toWorkWav(`${tmp}.wav`, wav);
-    fs.rmSync(`${tmp}.wav`, { force: true });
+    fs.writeFileSync(`${tmp}.bruto.wav`, Buffer.from(await res.arrayBuffer()));
+    toWorkWav(`${tmp}.bruto.wav`, wav);
+    fs.rmSync(`${tmp}.bruto.wav`, { force: true });
     return null;
   },
 

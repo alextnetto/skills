@@ -72,10 +72,10 @@ export default {
     const part = j.candidates?.[0]?.content?.parts?.find((p) => p.inlineData);
     if (!part) throw Object.assign(new Error(`o Gemini não devolveu áudio (${JSON.stringify(j).slice(0, 200)})`), { retry: true });
     const data = Buffer.from(part.inlineData.data, 'base64');
-    if (data.toString('ascii', 0, 4) === 'RIFF') fs.writeFileSync(`${tmp}.wav`, data);
-    else writeWav(`${tmp}.wav`, data, parseInt(part.inlineData.mimeType.match(/rate=(\d+)/)?.[1] || '24000', 10));
-    toWorkWav(`${tmp}.wav`, wav);
-    fs.rmSync(`${tmp}.wav`, { force: true });
+    if (data.toString('ascii', 0, 4) === 'RIFF') fs.writeFileSync(`${tmp}.bruto.wav`, data);
+    else writeWav(`${tmp}.bruto.wav`, data, parseInt(part.inlineData.mimeType.match(/rate=(\d+)/)?.[1] || '24000', 10));
+    toWorkWav(`${tmp}.bruto.wav`, wav);
+    fs.rmSync(`${tmp}.bruto.wav`, { force: true });
     return null;
   },
 

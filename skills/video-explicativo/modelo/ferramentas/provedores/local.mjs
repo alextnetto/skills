@@ -37,14 +37,14 @@ export default {
     fs.writeFileSync(txt, texto);
     if (mac) {
       const rate = Math.round(185 * (voz.velocidade ?? 1));
-      execFileSync('say', ['-v', id, '-r', String(rate), '-f', txt, '-o', `${tmp}.aiff`]);
-      toWorkWav(`${tmp}.aiff`, wav);
-      fs.rmSync(`${tmp}.aiff`, { force: true });
+      execFileSync('say', ['-v', id, '-r', String(rate), '-f', txt, '-o', `${tmp}.bruto.aiff`]);
+      toWorkWav(`${tmp}.bruto.aiff`, wav);
+      fs.rmSync(`${tmp}.bruto.aiff`, { force: true });
     } else if (win) {
-      const ps = `Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SelectVoice('${id.replace(/'/g, "''")}'); $s.Rate = ${Math.round(((voz.velocidade ?? 1) - 1) * 10)}; $s.SetOutputToWaveFile('${path.resolve(`${tmp}.wav`).replace(/'/g, "''")}'); $s.Speak([IO.File]::ReadAllText('${path.resolve(txt).replace(/'/g, "''")}')); $s.Dispose()`;
+      const ps = `Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SelectVoice('${id.replace(/'/g, "''")}'); $s.Rate = ${Math.round(((voz.velocidade ?? 1) - 1) * 10)}; $s.SetOutputToWaveFile('${path.resolve(`${tmp}.bruto.wav`).replace(/'/g, "''")}'); $s.Speak([IO.File]::ReadAllText('${path.resolve(txt).replace(/'/g, "''")}')); $s.Dispose()`;
       execFileSync('powershell', ['-NoProfile', '-Command', ps]);
-      toWorkWav(`${tmp}.wav`, wav);
-      fs.rmSync(`${tmp}.wav`, { force: true });
+      toWorkWav(`${tmp}.bruto.wav`, wav);
+      fs.rmSync(`${tmp}.bruto.wav`, { force: true });
     } else {
       throw new Error('a voz do computador só funciona no macOS e no Windows');
     }

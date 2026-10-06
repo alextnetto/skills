@@ -24,6 +24,7 @@ Crie uma tarefa para cada etapa e siga na ordem.
 
 ### 1. Preparar (uma vez por computador; depois só confere)
 
+0. `node --version`. Sem Node, ou com versão abaixo de 18, instale antes (comandos em `referencia/problemas.md`); é a única instalação que pode pedir a senha do usuário.
 1. Crie a pasta do vídeo a partir do modelo:
    `node "<pasta da skill>/modelo/ferramentas/novo.mjs" "<destino>" --titulo "<título>" --provedor <voz>`
    Destino: uma subpasta com o nome do tema dentro da pasta de trabalho atual. Se a pasta atual for a pasta pessoal do usuário (home), use `~/videos-explicativos/<tema>`.
