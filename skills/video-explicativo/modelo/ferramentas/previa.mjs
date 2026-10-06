@@ -8,22 +8,22 @@ import { P, scenes, ok, info } from './lib/comum.mjs';
 import { falaDe } from './lib/fala.mjs';
 
 const CPS = 16;
-let n = 0;
+let n = 0, kept = 0;
 for (const s of scenes) {
   const meta = path.join(P.audio, `${s.id}.json`);
   const text = falaDe(s);
   // mantém o que já existe (real ou de prévia) se a fala não mudou
-  if (fs.existsSync(meta) && JSON.parse(fs.readFileSync(meta)).text === text) continue;
+  if (fs.existsSync(meta) && JSON.parse(fs.readFileSync(meta)).text === text) { kept++; continue; }
   const starts = [...text].map((_, i) => i / CPS), ends = starts.map((t) => t + 1 / CPS);
   fs.writeFileSync(meta, JSON.stringify({ id: s.id, hash: 'fake', text, duration: text.length / CPS, starts, ends }));
   n++;
 }
-ok(`Tempos de prévia criados para ${n} cena(s).`);
+ok(`Tempos de prévia: ${n} cena(s) nova(s) ou alterada(s); ${kept} já tinham tempos (de prévia ou da narração) e foram mantidas.`);
 const run = (tool, extra = []) => {
   try { execFileSync(process.execPath, [path.join('ferramentas', tool), ...extra], { stdio: 'inherit' }); return true; }
   catch { return false; }
 };
 const layoutOk = run('checar.mjs');
 run('folhas.mjs', process.argv.slice(2));
-info('Abra as imagens em trabalho/folhas/ para revisar. Prévia não tem som; a duração é estimada.');
+info('Abra e olhe cada imagem em trabalho/folhas/ (começo, meio e fim de cada cena). Para um quadro em tamanho real: npm run renderizar -- --quadro <cena>@<segundos|meio|fim>.');
 process.exitCode = layoutOk ? 0 : 1;

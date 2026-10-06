@@ -7,7 +7,7 @@
 | "Falta o navegador que desenha os quadros" | `npx playwright install --only-shell chromium` |
 | "ffmpeg não encontrado" | `npm install` de novo (o pacote `ffmpeg-static` baixa o programa). Atrás de proxy corporativo o download pode falhar: instale o ffmpeg no sistema (`brew install ffmpeg` ou `winget install Gyan.FFmpeg`) |
 | "Rode este comando dentro da pasta do vídeo" | Entre na pasta que tem `video.config.js` |
-| "a frase "..." não aparece na fala" | O gatilho `@frase` precisa copiar um trecho da fala **falada** (depois da marcação `{tela|fala}`). Números e siglas contam como são falados |
+| "a frase "..." não aparece na fala" | O gatilho `@frase` precisa copiar um trecho da fala **falada** (depois da marcação `{tela\|fala}`). Números e siglas contam como são falados |
 | "tipo de item desconhecido" | Confira o nome no catálogo de `referencia/roteiro.md` |
 | "o rodapé (foot) não cabe em uma linha" | Encurte o `foot` (cerca de 140 caracteres no máximo) |
 | Verificador: "texto mais largo que a caixa" | Aumente `w`, diminua `size` ou encurte o texto |
@@ -21,10 +21,11 @@
 | Gemini "limite diário grátis" | Rode `npm run narrar` amanhã (as cenas prontas ficam guardadas) ou ative o faturamento no AI Studio |
 | Gemini "modelo não encontrado" | `npm run verificar` lista os modelos de voz da chave; ponha um deles em `voz.modelo` |
 | OpenAI "sem crédito" | Adicione crédito em platform.openai.com > Settings > Billing |
-| Voz lê sigla ou número errado | Use `{escrito|como se fala}` na fala e rode `npm run narrar` (só a cena alterada é refeita) |
+| Voz lê sigla ou número errado | Use a marcação de escrito e falado na fala (exemplos em `roteiro.md`) e rode `npm run narrar` (só a cena alterada é refeita) |
 | Voz rápida ou lenta demais | `ritmo` no `video.config.js` (1,05 acelera 5%) e depois `npm run renderizar` e `npm run montar` |
 | Imagem entra antes ou depois da fala | Confira o gatilho `@frase`; use `+0.3` para atrasar um pouco |
 | Tela vazia no começo de uma cena | O primeiro item entra tarde demais: use `at: 0.3` ou o começo da fala |
 | Vídeo final sem som em uma cena | Rode `npm run narrar` (faltou narrar essa cena) e depois `npm run montar` |
 | "desenhada com outro ritmo" | Mudou o `ritmo`: `npm run renderizar` e depois `npm run montar` |
+| Revisão: "Som e imagem com a mesma duração (diferença de até 120 ms)" | Normal: o formato de áudio AAC acrescenta um enchimento curto no fim. Só é problema acima disso |
 | Renderização lenta | Normal: cerca de 30 s por minuto de vídeo num computador recente. `-- --paralelo 2` usa menos memória |

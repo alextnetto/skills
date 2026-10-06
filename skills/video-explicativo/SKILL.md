@@ -26,8 +26,8 @@ Crie uma tarefa para cada etapa e siga na ordem.
 
 0. `node --version`. Sem Node, ou com versão abaixo de 18, instale antes (comandos em `referencia/problemas.md`); é a única instalação que pode pedir a senha do usuário.
 1. Crie a pasta do vídeo a partir do modelo:
-   `node "<pasta da skill>/modelo/ferramentas/novo.mjs" "<destino>" --titulo "<título>" --provedor <voz>`
-   Destino: uma subpasta com o nome do tema dentro da pasta de trabalho atual. Se a pasta atual for a pasta pessoal do usuário (home), use `~/videos-explicativos/<tema>`.
+   `node "<pasta da skill>/modelo/ferramentas/novo.mjs" "<destino>" --titulo "<título>"`
+   Destino: uma subpasta com o nome do tema dentro da pasta de trabalho atual. Se a pasta atual for a pasta pessoal do usuário (home), use `~/videos-explicativos/<tema>`. Se já souber a voz, acrescente `--provedor elevenlabs|gemini|openai|local`; se não, o padrão é `elevenlabs` e você troca no passo 4.
 2. Dentro da pasta: `npm install`. Na primeira vez baixa cerca de 150 MB (ffmpeg e o navegador que desenha os quadros) e leva alguns minutos; avise o usuário.
 3. `npm run verificar` e resolva cada ❌ na ordem que aparece. Sem Node: veja `referencia/problemas.md`.
 4. **Voz.** Se o `verificar` acusar falta de chave, faça uma pergunta só, com estas opções:
@@ -60,18 +60,18 @@ Se o vídeo afirma fatos (números, leis, datas, preços, nomes), pesquise em fo
 
 ### 5. Prévia sem custo
 
-`npm run previa` cria tempos provisórios, roda o verificador de layout e gera folhas de contato em `trabalho/folhas/`. Corrija todo ❌ e ⚠️ do verificador. Depois **abra e olhe cada folha** (são imagens): tela vazia por muito tempo, texto miúdo, item torto ou apertado. Repita até ficar limpo.
+`npm run previa` cria tempos provisórios, roda o verificador de layout e gera folhas de contato em `trabalho/folhas/` (começo, meio e fim de cada cena, com etiqueta). Corrija todo ❌ e ⚠️ do verificador. Depois **abra e olhe cada folha** (são imagens): tela vazia, texto miúdo, item torto ou apertado, caixa grande com pouco dentro. Para ver um quadro em tamanho real: `npm run renderizar -- --quadro <cena>@<segundos|meio|fim>`. Repita até ficar limpo.
 
 ### 6. Aprovar com o usuário (uma vez)
 
-Mostre em poucas linhas: título, capítulos (uma linha cada), duração estimada e custo (`npm run custo`), e mande uma folha de contato. Pergunte: "Posso gerar a narração?". Se o usuário já disse algo como "pode fazer tudo", pule esta etapa.
+Mostre em poucas linhas: título, capítulos (uma linha cada), duração estimada e custo (`npm run custo`). Mostre também uma folha de contato: anexe a imagem se a sua ferramenta permitir enviar arquivos; senão, abra-a para o usuário (`open <arquivo>` no macOS, `start <arquivo>` no Windows). Pergunte: "Posso gerar a narração?". Se o usuário já disse algo como "pode fazer tudo", pule esta etapa.
 
 ### 7. Narrar, desenhar e montar
 
 1. `npm run narrar`. Só cenas novas ou alteradas são narradas. Com Gemini, OpenAI ou voz do computador, o tempo de cada palavra é estimado sozinho; não há nada a fazer.
 2. `npm run checar` (agora com os tempos reais) e corrija o que aparecer.
 3. `npm run renderizar`, depois `npm run folhas`, e olhe as folhas de novo.
-4. `npm run montar` gera os arquivos em `saida/` e abre o vídeo.
+4. `npm run montar` gera os arquivos em `saida/` e abre o vídeo no player (`-- --sem-abrir` para não abrir).
 5. `npm run revisar` confere o formato e, se houver chave com transcrição, compara o que a voz falou com o roteiro. Sigla ou número lido errado: corrija a fala com `{escrito|como se fala}` e rode `npm run video` (refaz só o que mudou).
 
 Erros: `referencia/problemas.md`.
@@ -96,10 +96,10 @@ Ofereça dois ou três ajustes prováveis: voz um pouco mais rápida (`ritmo: 1.
 | `npm run vozes` | lista vozes; `-- --amostra id1,id2` grava amostras | só a amostra |
 | `npm run previa` | tempos provisórios, verificador e folhas de contato | não |
 | `npm run checar` | verificador de layout | não |
-| `npm run folhas` | folhas de contato em `trabalho/folhas/` | não |
+| `npm run folhas` | folhas de contato em `trabalho/folhas/`; `-- 0.05,0.5,0.97` escolhe os momentos | não |
 | `npm run narrar` | narração das cenas novas ou alteradas | sim |
-| `npm run renderizar` | desenha as cenas; `-- --quadro c1s2@fim` tira uma foto | não |
-| `npm run montar` | vídeo final, versão leve, legenda, capítulos, roteiro | não |
+| `npm run renderizar` | desenha as cenas; `-- --quadro c1s2@fim` (ou `@12.5`, `@meio`) tira uma foto em tamanho real | não |
+| `npm run montar` | vídeo final, versão leve, legenda, capítulos, roteiro; abre o vídeo (`-- --sem-abrir` evita) | não |
 | `npm run revisar` | formato e conferência da fala pela transcrição | pouco |
 | `npm run video` | validar, narrar, renderizar e montar em sequência | sim |
 

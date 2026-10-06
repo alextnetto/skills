@@ -135,6 +135,10 @@ window.checkLayout = () => {
       if (t.clientWidth > 0 && t.scrollWidth > t.clientWidth + 2)
         out.push(`${name}: texto mais largo que a caixa (${t.scrollWidth}px em ${t.clientWidth}px); diminua o size, aumente o w ou encurte o texto`);
     }
+    if (el.classList.contains('code') && el.clientWidth > 600) {
+      const widest = Math.max(0, ...[...el.querySelectorAll('.ln')].map((l) => l.offsetWidth));
+      if (widest && widest < 0.55 * (el.clientWidth - 60)) out.push(`${name}: caixa larga demais para o texto (o texto ocupa ${Math.round((100 * widest) / (el.clientWidth - 60))}%); diminua o w`);
+    }
     if (el.classList.contains('node') && el.scrollHeight > el.clientHeight + 2)
       out.push(`${name}: o texto não cabe na altura do bloco (${el.scrollHeight}px em ${el.clientHeight}px); aumente o h ou encurte`);
   }

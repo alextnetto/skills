@@ -1,6 +1,6 @@
 // Desenha cada cena quadro a quadro e grava trabalho/<id>.mp4. Só refaz cenas que mudaram.
 // Uso: npm run renderizar [-- --cenas c1s1,c2s3] [-- --tudo]
-//      npm run renderizar -- --quadro c2s3@8.5,c2s3@fim,todas@meio   (fotos PNG em trabalho/quadros/)
+//      npm run renderizar -- --quadro c2s3@8.5,c2s3@fim,todas@meio   (fotos em tamanho real em trabalho/quadros/)
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -41,8 +41,16 @@ try {
       try { info = await carregar(page, id); } catch (e) { bad(`${id}: ${e.message}`); process.exitCode = 1; continue; }
       const t = when === 'fim' ? info.duration - 0.35 : when === 'meio' ? info.duration / 2 : parseFloat(when);
       await page.evaluate((x) => window.seek(x), t);
+      // --etiqueta: carimba "cena @ tempo" no canto da foto (usado pelas folhas de contato)
+      if (a.has('--etiqueta')) await page.evaluate((txt) => {
+        const tag = document.createElement('div');
+        tag.id = 'etiqueta'; tag.textContent = txt;
+        Object.assign(tag.style, { position: 'absolute', left: '0', top: '0', zIndex: 99, padding: '6px 16px', background: '#1d2730', color: '#fff', font: '600 34px "IBM Plex Mono", monospace' });
+        document.getElementById('stage').append(tag);
+      }, `${id} @ ${t.toFixed(1)}s`);
       const file = path.join(Q, `${id}@${when}.png`);
       await page.screenshot({ path: file, type: 'png' });
+      await page.evaluate(() => document.getElementById('etiqueta')?.remove());
       console.log(path.relative(process.cwd(), file));
     }
   } else {

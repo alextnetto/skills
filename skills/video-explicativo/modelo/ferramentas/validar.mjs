@@ -2,7 +2,7 @@
 // tipos de item desconhecidos e imagens que não estão na pasta.
 import fs from 'node:fs';
 import path from 'node:path';
-import { scenes, ok, bad, mmss } from './lib/comum.mjs';
+import { P, scenes, ok, bad, info, mmss, RITMO } from './lib/comum.mjs';
 import { spoken, fold } from '../motor/marcacao.js';
 
 const TYPES = ['text', 'rule', 'node', 'group', 'edge', 'emph', 'strike', 'list', 'table', 'code', 'big', 'meter', 'range', 'timeline',
@@ -43,3 +43,12 @@ for (const s of scenes) {
 }
 if (errs.length) { errs.forEach((e) => bad(e)); process.exit(1); }
 ok(`Roteiro válido: ${scenes.length} cenas, ${words} palavras faladas (vídeo de ${mmss((words / 150) * 60)} a ${mmss((words / 120) * 60)}, conforme a voz).`);
+// com narração de verdade em todas as cenas, mostra a duração real
+let real = 0;
+for (const s of scenes) {
+  const f = path.join(P.audio, `${s.id}.json`);
+  const m = fs.existsSync(f) && JSON.parse(fs.readFileSync(f));
+  if (!m || m.hash === 'fake') { real = null; break; }
+  real += m.duration / RITMO + s.lead + s.tail;
+}
+if (real) info(`Com a narração atual: cerca de ${mmss(real)} (se a fala mudou, rode "npm run narrar").`);

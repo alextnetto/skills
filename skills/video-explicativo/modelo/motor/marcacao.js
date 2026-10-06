@@ -4,6 +4,7 @@
 const RE = /\{([^{}|]*)\|([^{}|]*)\}/g;
 
 export function segments(text) {
+  text = text.replace(/\\\|/g, '|'); // tolera "\|" copiado de tabela markdown
   const out = [];
   let last = 0;
   for (const m of text.matchAll(RE)) {

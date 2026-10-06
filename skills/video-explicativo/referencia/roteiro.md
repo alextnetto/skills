@@ -20,31 +20,51 @@ export const CAPITULOS = [
 | Cena de 15 a 40 segundos (40 a 100 palavras), uma ideia por cena | Cena longa fica com tela parada |
 | Frases curtas, com ponto. Evite parênteses e listas longas na fala | A voz lê parênteses sem mudar o tom |
 | Todo termo técnico é explicado na primeira vez: cartão `term` na tela e uma comparação do dia a dia na fala | O público é leigo inteligente |
-| Números, datas, valores e siglas aparecem na tela como se escreve e na fala como se fala: `{R$ 200 mil|duzentos mil reais}` | A voz erra algarismos e siglas |
+| Números, datas, valores e siglas aparecem na tela como se escreve e na fala como se fala: `{R$ 200 mil\|duzentos mil reais}` | A voz erra algarismos e siglas |
 | Algo novo entra na tela a cada 5 a 8 segundos de fala | Tela parada perde a atenção |
 | Fato com número, lei ou data só entra se estiver em `docs/fatos.md` com fonte; estimativa aparece como estimativa | Corrigir depois de narrar custa o dobro |
 | Cena com número ou dado de terceiros leva `foot` com a fonte | O espectador pode conferir |
+| Exemplo inventado para explicar (R$ 1.000 a 10% ao ano) não precisa de fonte, mas a tela diz que é exemplo: `foot: 'Exemplo ilustrativo, sem impostos nem taxas.'` | Ninguém confunde exemplo com dado |
+
+Modelo de `docs/fatos.md` (crie a pasta e o arquivo quando o vídeo afirmar fatos):
+
+```markdown
+# Fatos e fontes
+
+| Afirmação no vídeo | Cena | Fonte | Conferido em |
+|---|---|---|---|
+| O Pix foi lançado em 16 de novembro de 2020 | c0s2 | https://www.bcb.gov.br/estabilidadefinanceira/pix | 06/10/2026 |
+```
 
 ### Marcação `{tela|fala}`
 
 O que está antes da barra aparece na legenda; o que está depois é o que a voz fala.
 
-| Na fala do roteiro | A voz fala | A legenda mostra |
-|---|---|---|
-| `{R$ 1.220|mil duzentos e vinte reais}` | mil duzentos e vinte reais | R$ 1.220 |
-| `{48,8%|quarenta e oito vírgula oito por cento}` | quarenta e oito vírgula oito por cento | 48,8% |
-| `{01/12/2026|primeiro de dezembro de dois mil e vinte e seis}` | primeiro de dezembro... | 01/12/2026 |
-| `{INSS|i ene ésse ésse}` | i ene ésse ésse | INSS |
-| `{FIDC|fídique}` | fídique | FIDC |
-| `{IA|i a}` | i a | IA |
+```js
+// na fala do roteiro                                   a voz fala                              a legenda mostra
+'{R$ 1.220|mil duzentos e vinte reais}'              // mil duzentos e vinte reais              R$ 1.220
+'{48,8%|quarenta e oito vírgula oito por cento}'     // quarenta e oito vírgula oito por cento  48,8%
+'{01/12/2026|primeiro de dezembro de dois mil e vinte e seis}'
+'{INSS|i ene ésse ésse}'                              // i ene ésse ésse                         INSS
+'{FIDC|fídique}'                                      // fídique                                 FIDC
+'{IA|i a}'                                            // i a                                     IA
+```
 
 Siglas que viraram palavra (Pix, Detran, Petrobras) podem ficar como estão. Na dúvida, gere uma amostra: `npm run vozes -- --amostra <voz>` com a frase trocada, ou deixe o `npm run revisar` apontar.
 
 ## Estrutura de um vídeo
 
 1. **Abertura** (1 ou 2 cenas): uma frase de gancho (por que isso importa), a promessa (o que a pessoa vai saber no fim) e, se ajudar, um caso condutor.
-2. **Capítulos**: cada um abre com uma cena `card` curta ("Primeiro, a máquina.") e tem de 2 a 6 cenas.
+2. **Capítulos**: cada um abre com uma cena de cartão curta ("Primeiro, a máquina.") e tem de 2 a 6 cenas.
 3. **Fechamento**: uma cena com `recap` ("Em uma frase") e o próximo passo.
+
+| Duração | Capítulos | Cenas |
+|---|---|---|
+| até 2 min | 1 ou 2, **sem** cena de cartão de capítulo (em `index.js`, um capítulo só já basta) | 4 a 7, de 10 a 25 s cada |
+| 3 a 5 min | 3 ou 4, cada um com cartão | 10 a 18 |
+| 10 a 20 min | 6 a 8, cada um com cartão | 25 a 45 |
+
+A cena de cartão de capítulo dura 2 a 3 segundos; é a única exceção à regra de 15 a 40 segundos.
 
 **Caso condutor** (opcional, recomendado para negócios): uma empresa ou pessoa fictícia que atravessa o vídeo ("a Padaria Aurora quer..."). Cenas com `layout: 'ficha'` mostram um painel lateral que vai sendo preenchido. Configure `ficha` em `video.config.js` e marque o caso como ilustrativo no `foot`.
 
@@ -67,7 +87,7 @@ Siglas que viraram palavra (Pix, Detran, Petrobras) podem ficar como estão. Na 
 }
 ```
 
-- **Abertura de capítulo**: `{ id: 'c2s0', layout: 'card', card: { n: 2, title: 'O mercado' }, fala: 'Agora, o mercado.' }`.
+- **`layout: 'card'` tem dois usos.** Com `card: { n, title }`, é o cartão de abertura de capítulo e não precisa de `items`: `{ id: 'c2s0', layout: 'card', card: { n: 2, title: 'O mercado' }, fala: 'Agora, o mercado.' }`. Sem `card`, é uma composição livre e sem título (abertura e encerramento do vídeo): os `items` podem usar a tela de y 60 a 960; centralize o conjunto na altura (por exemplo, título em y 220 e o resto até y 760).
 - **`term`**: um cartão por vez, na faixa de baixo. Com mais de um termo na cena, use `until` no primeiro. Some sozinho antes do `recap`.
 - **`ficha`**: só em cenas com `layout: 'ficha'`. `field` é um par rótulo e valor; `stamp` é um item com check. Cada rótulo aparece uma vez no vídeo inteiro (o painel reserva um lugar fixo para cada um) e o painel comporta cerca de 9 campos e 6 carimbos no total. Em cenas `ficha`, o `foot` tem cerca de 100 caracteres.
 
@@ -105,19 +125,19 @@ Todos usam coordenadas em pixels (`x`, `y`, `w`, às vezes `h`) e `at`. Tons (`t
 |---|---|---|
 | `text` | frase solta, título de abertura, conclusão | `text`, `size` (40), `font` (`serif`, `sans`, `mono`), `weight`, `color` (`text`, `muted`, `accent`, `ink`), `align`, `italic`, `lh`, `out` |
 | `rule` | linha que se desenha | `x`, `y`, `w` |
-| `node` | caixa de um diagrama | `id`, `h`, `label`, `sub`, `tone` (`ink`, `accent`, `muted`, `ghost`), `out` |
-| `edge` | seta entre caixas (declare depois delas) | `from`, `to`, `label`, `dashed`, `bend` (curva, em px) |
+| `node` | caixa de um diagrama | `id`, `h`, `label`, `sub`, `tone`: `ink` (normal), `accent` (destaque), `muted` (tracejada e cinza: o que fica de fora, opcional, desligado), `ghost` (tracejada clara: lugar vazio, a preencher); `out` |
+| `edge` | seta entre caixas (declare depois delas) | `from`, `to`, `label`, `dashed`, `bend`: curva em px; positivo curva para a direita de quem segue a seta (para baixo numa seta que vai para a direita), negativo para o outro lado |
 | `group` | moldura tracejada em volta de caixas (declare antes delas) | `h`, `label`, `tone` |
 | `emph` | pulso de destaque numa caixa | `target`, `dur` |
 | `strike` | risca uma caixa | `target` |
 | `list` | lista que entra item a item | `size` (36), `gap` (20), `marker` (`dash`, `num`, `check`, `none`), `columns`, `items: [{ text, sub, tone, at }]` |
-| `table` | tabela que entra linha a linha | `size` (30), `headAt`, `cols: [{ label, w (peso relativo), align }]`, `rows: [{ cells: [...], tone, at }]` |
+| `table` | tabela que entra linha a linha | `size` (30), `headAt`, `cols: [{ label, w (peso relativo), align: 'left', 'center' ou 'right' }]`, `rows: [{ cells: [...], tone, at }]` |
 | `code` | caixa monoespaçada: contas, trechos, linhas de cálculo | `size` (30), `title`, `tone`, `lines: [{ text, tone, at }]`, `strikeAt` |
 | `big` | número grande que conta até o valor | `value`, `decimals`, `prefix`, `suffix`, `from`, `label`, `size` (200), `countDur` |
 | `doc` | cartão de documento: recibo, nota, ficha, pedido | `title`, `lines: [{ l, r, note, tone, at }]` |
 | `image` | imagem da pasta `midia/` (logo, print, foto, gráfico pronto) | `h`, `src: 'midia/arquivo.png'`, `fit` (`contain`, `cover`), `frame`, `caption`, `pop`, `out` |
-| `timeline` | linha do tempo com marcos | `at`, `startLabel`, `endLabel`, `points: [{ pos (0 a 1), date, label: 'linha 1|linha 2', side ('up', 'down'), tone, at }]` |
-| `hbars` | barras horizontais na mesma escala | `max`, `labelW`, `rowH`, `rows: [{ label, note, value, display, tone, at }]` |
+| `timeline` | linha do tempo com marcos | `at`, `startLabel`, `endLabel`, `points: [{ pos (0 a 1), date, label, side ('up', 'down'), tone, at }]`; no `label`, uma barra vertical separa a linha de cima da de baixo |
+| `hbars` | barras horizontais na mesma escala | `max`, `labelW` (520), `rowH` (92), `rows: [{ label, note, value, display, tone, at }]` |
 | `bars` | colunas empilhadas por ano ou categoria | `h`, `max`, `ticks`, `tickFmt` ('R$ # mi'), `series: [{ name, tone }]`, `years: [{ label, values: [...], totalLabel, at }]` |
 | `jbars` | barras em volta do zero (caixa acumulado, lucro e prejuízo) | `h`, `min`, `max`, `ticks`, `tickFmt`, `caption`, `bars: [{ label, value, display, tone, at }]` |
 | `meter` | barra contra um limite | `max`, `mark`, `markLabel`, `markAt`, `value`, `valueLabel`, `valueAt`, `overLabel`, `overAt` |
@@ -150,5 +170,6 @@ Todos usam coordenadas em pixels (`x`, `y`, `w`, às vezes `h`) e `at`. Tons (`t
 ## Depois de escrever
 
 1. `npm run validar`: ids, falas e gatilhos.
-2. `npm run previa`: verificador de layout e folhas de contato em `trabalho/folhas/`. Abra cada folha e olhe de verdade: tela vazia por muito tempo, texto miúdo, coisas tortas.
-3. Ajuste e repita até ficar limpo. Só então narre.
+2. `npm run previa`: verificador de layout e folhas de contato em `trabalho/folhas/`, com começo, meio e fim de cada cena e a etiqueta "cena @ tempo" em cada miniatura. Abra cada folha e olhe de verdade: tela vazia, texto miúdo, coisas tortas, caixa grande com pouco dentro, um lado da tela vazio. Espaços cinza no fim da última folha são só enchimento.
+3. Na dúvida, veja o quadro em tamanho real: `npm run renderizar -- --quadro c2s1@12.5` (também aceita `@meio`, `@fim` e listas separadas por vírgula; `todas@fim` fotografa o fim de todas as cenas). Para outros momentos nas folhas: `npm run folhas -- 0.05,0.3,0.6,0.97`.
+4. Ajuste e repita até ficar limpo. Só então narre.

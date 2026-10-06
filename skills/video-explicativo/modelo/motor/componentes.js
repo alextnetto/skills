@@ -310,7 +310,7 @@ const BUILDERS = {
       const cx = it.x + pt.pos * it.w, at = ctx.T(pt.at);
       const dot = place(h('div', `tl-dot tone-${pt.tone || 'ink'}`), { x: cx, y: it.y });
       dot.dataset.baseT = 'translate(-50%, -50%)'; ctx.content.append(dot); pop(ctx.tl, dot, at);
-      const [a, b] = pt.label.split('|');
+      const [a, b] = pt.label.replace(/\\\|/g, '|').split('|');
       const lab = h('div', `tl-lab tone-${pt.tone || 'ink'}`, `<div class="d">${esc(pt.date)}</div><div class="a">${esc(a)}</div>${b ? `<div class="b">${esc(b)}</div>` : ''}`);
       const lx = Math.min(Math.max(cx, ctx.area.x + 150), ctx.area.x + ctx.area.w - 150);
       place(lab, { x: lx, y: pt.side === 'up' ? it.y - 30 : it.y + 30 });
@@ -325,7 +325,7 @@ const BUILDERS = {
     const el = place(h('div', 'hbars'), { x: it.x, y: it.y, w: it.w, h: it.rows.length * RH });
     it.rows.forEach((r, i) => {
       const top = i * RH;
-      const lab = place(h('div'), { x: 0, y: top, w: LW - 30 });
+      const lab = place(h('div'), { x: 0, y: top + (r.note ? 0 : 11), w: LW - 30 }); // sem nota, centraliza o rótulo na barra
       lab.append(h('div', 'rl', rich(r.label)), h('div', 'rn', esc(r.note || '')));
       const width = Math.max(8, (r.value / it.max) * bw);
       const bar = h('div', `rb tone-${r.tone || 'ink'}`);

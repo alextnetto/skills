@@ -18,15 +18,20 @@ const total = dur(/Duration: (\d+):(\d+):([\d.]+)/);
 const video = probe.match(/Video: (\w+).*?, (\d+)x(\d+).*?, ([\d.]+) fps/);
 const audio = probe.match(/Audio: (\w+).*?, (\d+) Hz/);
 if (video && video[1] === 'h264' && video[2] === '1920' && video[3] === '1080' && Math.abs(parseFloat(video[4]) - 30) < 0.01) ok(`Vídeo H.264 1920x1080, 30 quadros por segundo, ${mmss(total)}`);
-else bad(`Formato de vídeo inesperado: ${video ? video[0] : 'sem trilha de vídeo'}`);
-if (audio && audio[1] === 'aac') ok(`Áudio AAC ${audio[2]} Hz`); else bad('Áudio ausente ou em formato inesperado');
-const a = spawnSync(ffmpegPath(), ['-hide_banner', '-i', OUT, '-map', '0:a', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
+else { bad(`Formato de vídeo inesperado: ${video ? video[0] : 'sem trilha de vídeo'}`); process.exitCode = 1; }
+if (audio && audio[1] === 'aac') ok(`Áudio AAC ${audio[2]} Hz`); else { bad('Áudio ausente ou em formato inesperado'); process.exitCode = 1; }
+// imagem: número de quadros / 30; som: decodificado inteiro (o AAC acrescenta uns 20 a 50 ms de enchimento no fim, normal)
 const v = spawnSync(ffmpegPath(), ['-hide_banner', '-i', OUT, '-map', '0:v', '-c', 'copy', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
-const last = (s) => { const all = [...s.matchAll(/time=(\d+):(\d+):([\d.]+)/g)]; const m = all[all.length - 1]; return m ? (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]) : null; };
-const da = last(a), dv = last(v);
-if (da != null && dv != null) Math.abs(da - dv) < 0.1 ? ok(`Som e imagem com a mesma duração (diferença ${Math.round(Math.abs(da - dv) * 1000)} ms)`) : bad(`Som e imagem com durações diferentes: ${da.toFixed(2)} s x ${dv.toFixed(2)} s`);
+const a = spawnSync(ffmpegPath(), ['-hide_banner', '-i', OUT, '-map', '0:a', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
+const frames = [...v.matchAll(/frame=\s*(\d+)/g)].map((m) => +m[1]).pop();
+const times = [...a.matchAll(/time=(\d+):(\d+):([\d.]+)/g)].map((m) => (+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]));
+const dv = frames != null ? frames / 30 : null, da = times.length ? times[times.length - 1] : null;
+if (dv != null && da != null) {
+  if (Math.abs(da - dv) < 0.12) ok(`Som e imagem com a mesma duração (diferença ${Math.round(Math.abs(da - dv) * 1000)} ms, normal)`);
+  else { bad(`Som e imagem com durações diferentes: ${da.toFixed(2)} s x ${dv.toFixed(2)} s. Rode "npm run montar" de novo.`); process.exitCode = 1; }
+}
 
-if (args().has('--sem-transcricao')) process.exit(0);
+if (args().has('--sem-transcricao')) process.exit();
 
 // 2. transcrição: usa o provedor configurado ou qualquer outro com chave que saiba transcrever
 const order = [config.voz?.provedor, ...PROVEDORES].filter((x, i, arr) => x && arr.indexOf(x) === i);
@@ -42,7 +47,7 @@ for (const id of order) {
     break;
   } catch (e) { warn(`Transcrição com ${p.nome} falhou: ${e.message}`); }
 }
-if (!words) { info('Sem transcrição automática (nenhuma chave com transcrição). Assista ao vídeo para conferir a pronúncia.'); process.exit(0); }
+if (!words) { info('Sem transcrição automática (nenhuma chave com transcrição). Assista ao vídeo para conferir a pronúncia.'); process.exit(); }
 
 const norm = (w) => w.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
 const script = JSON.parse(fs.readFileSync(path.join(P.work, 'script.json')));
