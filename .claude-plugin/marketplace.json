@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "alextnetto",
+  "description": "Skills do Alex Netto para agentes de IA, em português.",
+  "owner": { "name": "Alex Netto", "url": "https://alexnet.to" },
+  "plugins": [
+    {
+      "name": "video-explicativo",
+      "description": "Vídeo explicativo narrado em português sobre qualquer assunto ou pesquisa: roteiro, voz (ElevenLabs, Gemini, OpenAI ou do computador), animação sincronizada com a fala e legenda.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/video-explicativo"]
+    }
+  ]
+}
